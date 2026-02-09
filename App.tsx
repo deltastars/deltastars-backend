@@ -10,10 +10,10 @@ import { DashboardPage } from './DashboardPage';
 import { VipLoginPage } from './VipLoginPage';
 import { VipDashboardPage } from './VipDashboardPage';
 import { LoadingSpinner } from './LoadingSpinner';
-import { CartItem, Product, User, Page, ShowroomItem, Invoice, Payment, VipClient, VipTransaction, Review } from '../types';
-import { I18nProvider, GeminiAiProvider, useI18n } from '../contexts/I18nContext';
-import { ToastProvider, useToast } from '../contexts/ToastContext';
-import { SettingsProvider, useSettings } from '../contexts/SettingsContext';
+import { CartItem, Product, User, Page, ShowroomItem, Invoice, Payment, VipClient, VipTransaction, Review } from './types';
+import { I18nProvider, GeminiAiProvider, useI18n } from './contexts/I18nContext';
+import { ToastProvider, useToast } from './contexts/ToastContext';
+import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { ToastContainer } from './ToastContainer';
 import { mockProducts } from './products';
 import { mockInvoices, mockPayments, mockVipClients, mockTransactions } from './accounting';
@@ -27,7 +27,6 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { AiAssistant } from './AiAssistant';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { TermsAndConditions } from './TermsAndConditions';
-import { MusicPlayer } from './multimedia/MusicPlayer';
 import { ImageZoomModal } from './lib/ImageZoomModal';
 
 
