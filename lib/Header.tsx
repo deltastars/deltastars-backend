@@ -1,264 +1,71 @@
-
-import React, { useState, useEffect } from 'react';
-import { ShoppingCartIcon, UserIcon, MenuIcon, XIcon, LogoutIcon, LogoIcon, HeartIcon, SparklesIcon } from './Icons';
-import { User, Page, Product } from '../../types';
-import { useI18n, Currency } from '../../contexts/I18nContext';
-import { useSettings } from '../../contexts/SettingsContext';
+import React from 'react';
+import { User, Page } from '../../types';
 
 interface HeaderProps {
-  setPage: (page: Page, productId?: number) => void;
+  setPage: (page: Page) => void;
   cartItemCount: number;
-  wishlistItemCount: number;
   user: User | null;
   onLogout: () => void;
   onToggleAiAssistant: () => void;
-  currentPage: Page;
-  products: Product[];
-  selectedProductId: number | null;
 }
 
-const DateDisplay = () => {
-    const { language } = useI18n();
-    const [dates, setDates] = useState({ gregorian: '', hijri: '' });
-
-    useEffect(() => {
-        const now = new Date();
-        const gregorianFormatter = new Intl.DateTimeFormat(language === 'ar' ? 'ar-SA' : 'en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-        });
-        const hijriFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-        });
-
-        setDates({
-            gregorian: gregorianFormatter.format(now),
-            hijri: hijriFormatter.format(now),
-        });
-    }, [language]);
-
-    return (
-        <div className="text-center md:text-right text-xs text-white font-extrabold">
-            {language === 'ar' ? <p>{dates.hijri}</p> : <p>{dates.gregorian}</p>}
-        </div>
-    );
-}
-
-const CurrencySwitcher: React.FC = () => {
-    const { currency, setCurrency, t } = useI18n();
-    const currencies: { code: Currency, label: string }[] = [
-        { code: 'sar', label: 'SAR (ر.س)' },
-        { code: 'usd', label: 'USD ($)' },
-        { code: 'eur', label: 'EUR (€)' },
-    ];
-    
-    return (
-        <div className="relative">
-            <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as Currency)}
-                className="bg-primary text-white font-black border-2 border-transparent hover:border-white rounded-md p-2 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary"
-                aria-label={t('header.selectCurrency')}
-            >
-                {currencies.map(c => (
-                    <option key={c.code} value={c.code} className="bg-primary-dark text-white font-bold">
-                        {c.label}
-                    </option>
-                ))}
-            </select>
-        </div>
-    )
-}
-
-export const Header: React.FC<HeaderProps> = ({ 
-  setPage, 
-  cartItemCount, 
-  user, 
-  onLogout, 
-  wishlistItemCount, 
-  onToggleAiAssistant,
-  currentPage,
-  products,
-  selectedProductId
-}) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { t, language, setLanguage } = useI18n();
-  const { settings } = useSettings();
-
-  const toggleLanguage = () => {
-    const newLang = language === 'ar' ? 'en' : 'ar';
-    setLanguage(newLang);
-  };
-  
-  const navLinkTranslations = t('header.navLinks', { returnObjects: true });
-  
-  const navLinks = [
-    { label: navLinkTranslations.home, page: 'home' as const },
-    { label: navLinkTranslations.products, page: 'products' as const },
-    { label: navLinkTranslations.showroom, page: 'showroom' as const },
-    { label: navLinkTranslations.wishlist, page: 'wishlist' as const },
-    ...(user && user.type === 'admin' ? [{ label: navLinkTranslations.dashboard, page: 'dashboard' as const }] : []),
-  ];
-
-  const getBreadcrumbs = () => {
-    const breadcrumbs = [{ label: t('header.home'), page: 'home' as Page, clickable: true }];
-
-    switch (currentPage) {
-      case 'products':
-        breadcrumbs.push({ label: t('header.products'), page: 'products' as Page, clickable: false });
-        break;
-      case 'productDetail':
-        breadcrumbs.push({ label: t('header.products'), page: 'products' as Page, clickable: true });
-        if (selectedProductId) {
-            const product = products.find(p => p.id === selectedProductId);
-            if (product) {
-                const name = language === 'ar' ? product.name_ar : product.name_en;
-                breadcrumbs.push({ label: name, page: 'productDetail' as Page, clickable: false });
-            }
-        }
-        break;
-      case 'cart':
-        breadcrumbs.push({ label: t('cart.title'), page: 'cart' as Page, clickable: false });
-        break;
-      case 'wishlist':
-        breadcrumbs.push({ label: t('wishlist.title'), page: 'wishlist' as Page, clickable: false });
-        break;
-      case 'showroom':
-        breadcrumbs.push({ label: t('showroom.title'), page: 'showroom' as Page, clickable: false });
-        break;
-      case 'login':
-        breadcrumbs.push({ label: t('login.title'), page: 'login' as Page, clickable: false });
-        break;
-      case 'dashboard':
-        breadcrumbs.push({ label: t('dashboard.title'), page: 'dashboard' as Page, clickable: false });
-        break;
-      case 'vipLogin':
-         breadcrumbs.push({ label: t('vip.login.title'), page: 'vipLogin' as Page, clickable: false });
-         break;
-      case 'vipDashboard':
-         breadcrumbs.push({ label: t('vip.dashboard.title'), page: 'vipDashboard' as Page, clickable: false });
-         break;
-      case 'privacy':
-        breadcrumbs.push({ label: t('footer.privacy'), page: 'privacy' as Page, clickable: false });
-        break;
-      case 'terms':
-        breadcrumbs.push({ label: t('footer.terms'), page: 'terms' as Page, clickable: false });
-        break;
-    }
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = getBreadcrumbs();
-
+export const Header: React.FC<HeaderProps> = ({ setPage, cartItemCount, user, onLogout }) => {
   return (
-    <header className="bg-primary shadow-lg sticky top-0 z-50">
-      <div className="bg-primary-dark py-2">
-         <div className="container mx-auto px-4 flex justify-between items-center">
-            <DateDisplay />
-            <div className="text-sm text-white font-extrabold">{settings.company.name || t('header.storeTitle')}</div>
-         </div>
-      </div>
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-2">
-          <div className="flex items-center" dir="ltr">
-            <button onClick={() => setPage('home')} className="flex items-center gap-3">
-              <img src={settings.company.logoUrl} alt="Logo" className="w-14 h-14 object-contain" />
-              <h1 className="text-white text-3xl font-black hidden sm:block">{settings.company.name}</h1>
-            </button>
-          </div>
-
-          <nav className="hidden lg:flex items-center space-x-6">
-            {navLinks.map(link => (
-                <button 
-                  key={link.page} 
-                  onClick={() => setPage(link.page)} 
-                  className={`hover:text-secondary transition-colors duration-200 text-lg font-black ${currentPage === link.page ? 'text-secondary border-b-4 border-secondary' : 'text-white'}`}
-                >
-                  {link.label}
-                </button>
-            ))}
-          </nav>
-
-          <div className="flex items-center space-x-4" dir="ltr">
-            <CurrencySwitcher />
-            <button onClick={toggleLanguage} className="text-white hover:text-secondary transition-colors font-black px-2 py-1 rounded-md border-2 border-transparent hover:border-white">
-              {language === 'ar' ? 'EN' : 'AR'}
-            </button>
-             <button onClick={onToggleAiAssistant} className="text-white hover:text-secondary transition-colors" title={t('aiAssistant.open')}>
-              <SparklesIcon className="w-6 h-6" />
-            </button>
-            {user ? (
-              <button onClick={onLogout} className="text-white hover:text-secondary transition-colors" title={t('header.logout')}>
-                <LogoutIcon />
-              </button>
-            ) : (
-              <button onClick={() => setPage('login')} className="text-white hover:text-secondary transition-colors" title={t('header.login')}>
-                <UserIcon />
-              </button>
-            )}
-            <button onClick={() => setPage('wishlist')} className="relative text-white hover:text-secondary transition-colors" title={t('header.wishlist')}>
-              <HeartIcon filled={wishlistItemCount > 0} className="w-6 h-6" />
-              {wishlistItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-black rounded-full h-5 w-5 flex items-center justify-center">
-                  {wishlistItemCount}
-                </span>
-              )}
-            </button>
-            <button onClick={() => setPage('cart')} className="relative text-white hover:text-secondary transition-colors">
-              <ShoppingCartIcon />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-black rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </button>
-            <button className="lg:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <XIcon /> : <MenuIcon />}
-            </button>
-          </div>
+    <header className="fixed top-0 left-0 w-full z-[1000] bg-white/95 backdrop-blur-xl border-b-4 border-yellow-600 shadow-2xl">
+      <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+        
+        {/* الهوية التجارية الجديدة الثابتة */}
+        <div className="flex flex-col cursor-pointer group" onClick={() => setPage('home')}>
+          <h1 className="text-3xl font-black text-[#1a3a1a] tracking-tighter uppercase group-hover:text-yellow-600 transition-colors">
+            نجوم دلتا للتجارة
+          </h1>
+          <span className="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-widest">
+            شريكك الأمثل للخضروات والفواكه والتمور عالية الجودة
+          </span>
         </div>
-      </div>
-       {isMenuOpen && (
-        <div className="lg:hidden bg-primary-dark">
-          <nav className="flex flex-col items-center py-4">
-             {navLinks.map(link => (
+
+        {/* أزرار التحكم والدخول الذكي */}
+        <div className="flex items-center gap-8">
+          {user ? (
+            <div className="flex items-center gap-4 bg-gray-100 p-2 rounded-full px-6 border border-gray-200 shadow-inner">
+              <div className="flex flex-col text-right">
+                <span className="text-[11px] font-black text-[#1a3a1a] leading-none">{user.email}</span>
+                <span className="text-[9px] font-bold text-emerald-600">الجلسة نشطة الآن ✓</span>
+              </div>
+              
+              {/* زر المطور السري - لا يظهر إلا عند دخولك بإيميل المطور فقط */}
+              {user.type === 'developer' && (
                 <button 
-                  key={link.page} 
-                  onClick={() => { setPage(link.page); setIsMenuOpen(false); }} 
-                  className="text-white py-2 w-full text-center hover:bg-primary-light transition-colors duration-200 font-black"
+                  onClick={() => setPage('dev_console')}
+                  className="bg-yellow-500 text-black p-2 rounded-xl hover:rotate-180 transition-transform shadow-lg border-b-4 border-yellow-700 active:translate-y-1 active:border-b-0"
+                  title="لوحة العمليات التقنية"
                 >
-                  {link.label}
+                  ⚙️
                 </button>
-            ))}
-          </nav>
-        </div>
-      )}
-      
-      {currentPage !== 'home' && (
-         <div className="bg-gray-100 py-2 shadow-inner border-t border-gray-200">
-            <div className="container mx-auto px-4">
-                <nav className="flex" aria-label="Breadcrumb">
-                    <ol className="inline-flex items-center space-x-1 md:space-x-3 rtl:space-x-reverse flex-wrap">
-                        {breadcrumbs.map((crumb, index) => (
-                            <li key={index} className="inline-flex items-center">
-                                {index > 0 && (
-                                     <svg className="w-3 h-3 text-gray-600 mx-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
-                                    </svg>
-                                )}
-                                {crumb.clickable ? (
-                                    <button onClick={() => setPage(crumb.page)} className="inline-flex items-center text-sm font-extrabold text-gray-700 hover:text-primary">
-                                        {crumb.label}
-                                    </button>
-                                ) : (
-                                    <span className="ml-1 text-sm font-extrabold text-gray-600 md:ml-2 truncate max-w-[150px] md:max-w-none">{crumb.label}</span>
-                                )}
-                            </li>
-                        ))}
-                    </ol>
-                </nav>
+              )}
+              
+              <button onClick={onLogout} className="text-[11px] text-red-600 font-black border-r-2 pr-4 border-gray-300 hover:text-red-800">خروج</button>
             </div>
+          ) : (
+            <button 
+              onClick={() => setPage('login')} 
+              className="text-sm font-black text-white bg-[#1a3a1a] px-8 py-3 rounded-full hover:bg-yellow-600 transition-all shadow-lg border-b-4 border-green-900 active:translate-y-1 active:border-b-0"
+            >
+              دخول الإدارة
+            </button>
+          )}
+
+          {/* سلة المشتريات */}
+          <div className="relative cursor-pointer group" onClick={() => setPage('cart')}>
+            <span className="text-3xl group-hover:scale-110 transition-transform inline-block">🛒</span>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white animate-bounce shadow-xl">
+                {cartItemCount}
+              </span>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };
