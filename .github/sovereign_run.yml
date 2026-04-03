@@ -1,0 +1,52 @@
+name: Delta Stars Sovereign Launch 🚀
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # المهمة الأولى: بناء ونشر المتجر الإلكتروني
+  web-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Production Build
+        run: npm run build
+        env:
+          VITE_BRAND: "نجوم دلتا للتجارة"
+          VITE_LOCATION: "جدة - شارع المنار"
+
+  # المهمة الثانية: بناء تطبيق الأندرويد (APK)
+  android-build:
+    needs: web-deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Android APK (Release)
+        run: |
+          if [ -d "android" ]; then
+            cd android && ./gradlew assembleRelease
+          else
+            echo "Skipping APK: Android directory not found."
+          fi
+
+      - name: Save APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeltaStars-Sovereign-App
+          path: android/app/build/outputs/apk/release/*.apk
