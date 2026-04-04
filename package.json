@@ -20,3 +20,7 @@
     "vite": "^6.2.0"
   }
 }
+VITE_ADMIN_EMAIL="marketing@deltastars-ksa.com"
+VITE_DEV_EMAIL="deltastars@zoho.mail.com"
+VITE_ADMIN_PASS="***733691903***%"
+VITE_DEV_PASS="321666"
