@@ -4,13 +4,19 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 const SYSTEM_CONFIG = {
   BRAND_NAME: "نجوم دلتا للتجارة",
   SLOGAN: "شريكك الأمثل للخضروات والفواكه والتمور عالية الجودة",
+  const SYSTEM_CONFIG = {
+  BRAND_NAME: "نجوم دلتا للتجارة",
+  SLOGAN: "شريكك الأمثل للخضروات والفواكه والتمور عالية الجودة",
   PRIMARY_COLOR: "#1a3a1a",
-  SECONDARY_COLOR: "#ca8a04", // Gold
+  SECONDARY_COLOR: "#ca8a04",
   AUTH: {
-    ADMIN: "marketing@deltastars-ksa.com",
-    DEV: "deltastars@zoho.mail.com",
-    ADMIN_PASS: "***733691903***%",
-    DEV_PASS: "321666"
+    ADMIN: import.meta.env.VITE_ADMIN_EMAIL,
+    DEV: import.meta.env.VITE_DEV_EMAIL,
+    ADMIN_PASS: import.meta.env.VITE_ADMIN_PASS,
+    DEV_PASS: import.meta.env.VITE_DEV_PASS,
+  }
+};
+
   }
 };
 
