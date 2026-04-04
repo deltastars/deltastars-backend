@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-
 // --- إعدادات النظام الموحدة ---
 const SYSTEM_CONFIG = {
   BRAND_NAME: "نجوم دلتا للتجارة",
